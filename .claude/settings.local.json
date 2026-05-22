@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"/Users/matthewelsea/Downloads/\" | grep -i cocktail)",
+      "Bash(unzip -o cocktail-menu-app.zip -d cocktail-menu-app-extracted)",
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(git init *)",
+      "Bash(echo 'node_modules/ *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
