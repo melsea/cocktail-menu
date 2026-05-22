@@ -529,6 +529,8 @@ export default function CocktailMenu() {
       letterSpacing: "0.04em",
       fontFamily: "inherit",
       transition: "all 0.15s ease",
+      flexShrink: 0,
+      whiteSpace: "nowrap",
     }}>
       {children}
     </button>
@@ -543,7 +545,10 @@ export default function CocktailMenu() {
     }}>
       {/* Header */}
       <div style={{
-        padding: "32px 20px 16px",
+        paddingTop: "calc(32px + env(safe-area-inset-top))",
+        paddingRight: "20px",
+        paddingBottom: "16px",
+        paddingLeft: "20px",
         borderBottom: "1px solid #2a2520",
         background: "linear-gradient(180deg, #1a1612 0%, #0f0f0f 100%)",
         position: "sticky",
@@ -559,7 +564,7 @@ export default function CocktailMenu() {
           color: "#d4a867",
           textAlign: "center",
         }}>
-          The Menu
+          The Spec
         </h1>
         <p style={{
           textAlign: "center",
@@ -593,16 +598,16 @@ export default function CocktailMenu() {
         />
 
         {/* Filter rows */}
-        <div style={{ display: "flex", gap: 5, flexWrap: "wrap", justifyContent: "center", marginBottom: 6 }}>
+        <div className="filter-scroll" style={{ display: "flex", gap: 5, marginBottom: 6 }}>
           {categories.map(cat => (
             <Pill key={cat} active={filterCat === cat} onClick={() => setFilterCat(cat)}>{cat}</Pill>
           ))}
         </div>
-        <div style={{ display: "flex", gap: 5, flexWrap: "wrap", justifyContent: "center" }}>
+        <div className="filter-scroll" style={{ display: "flex", gap: 5 }}>
           {methods.map(m => (
             <Pill key={m} active={filterMethod === m} onClick={() => setFilterMethod(m)}>{m}</Pill>
           ))}
-          <span style={{ width: 1, background: "#2a2520", margin: "0 4px" }} />
+          <span style={{ width: 1, background: "#2a2520", margin: "0 4px", flexShrink: 0 }} />
           {sources.map(s => (
             <Pill key={s} active={filterSource === s} onClick={() => setFilterSource(s)}>{s}</Pill>
           ))}
