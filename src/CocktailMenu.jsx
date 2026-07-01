@@ -494,6 +494,7 @@ const catColors = {
 
 export default function CocktailMenu() {
   const [selected, setSelected] = useState(null);
+  const [renderedIndex, setRenderedIndex] = useState(null);
   const [filterCat, setFilterCat] = useState("All");
   const [filterSource, setFilterSource] = useState("All");
   const [filterMethod, setFilterMethod] = useState("All");
@@ -515,7 +516,13 @@ export default function CocktailMenu() {
     return true;
   });
 
-  const drink = selected !== null ? cocktails[selected] : null;
+  const drink = renderedIndex !== null ? cocktails[renderedIndex] : null;
+
+  const openDrink = (i) => {
+    setRenderedIndex(i);
+    setSelected(i);
+  };
+  const closeDrink = () => setSelected(null);
 
   const Pill = ({ children, active, onClick }) => (
     <button onClick={onClick} style={{
@@ -614,24 +621,52 @@ export default function CocktailMenu() {
         </div>
       </div>
 
-      {/* Detail view */}
-      {drink ? (
+      {/* Detail view — full-screen panel that pushes in from the right */}
+      <div
+        onTransitionEnd={() => {
+          if (selected === null) setRenderedIndex(null);
+        }}
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 50,
+          background: "#0f0f0f",
+          transform: selected !== null ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 0.32s cubic-bezier(0.32, 0.72, 0, 1)",
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
+          visibility: drink ? "visible" : "hidden",
+        }}
+      >
+        {drink && (
         <div style={{ padding: "0 20px 40px", maxWidth: 500, margin: "0 auto" }}>
-          <button
-            onClick={() => setSelected(null)}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#d4a867",
-              fontSize: 14,
-              cursor: "pointer",
-              padding: "16px 0 8px",
-              fontFamily: "inherit",
-              letterSpacing: "0.05em",
-            }}
-          >
-            ← Back
-          </button>
+          <div style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1,
+            paddingTop: "calc(12px + env(safe-area-inset-top))",
+            paddingBottom: 12,
+            marginBottom: 8,
+            background: "#0f0f0fee",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+          }}>
+            <button
+              onClick={closeDrink}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#d4a867",
+                fontSize: 15,
+                cursor: "pointer",
+                padding: "8px 0",
+                fontFamily: "inherit",
+                letterSpacing: "0.05em",
+              }}
+            >
+              ‹ Back
+            </button>
+          </div>
 
           <div style={{
             background: catColors[drink.category]?.bg || "#1a1a1a",
@@ -747,71 +782,72 @@ export default function CocktailMenu() {
             </div>
           )}
         </div>
-      ) : (
-        /* List view */
-        <div style={{ padding: "4px 20px 40px", maxWidth: 500, margin: "0 auto" }}>
-          {filtered.length === 0 && (
-            <p style={{ textAlign: "center", color: "#6a6054", fontStyle: "italic", marginTop: 32 }}>
-              No cocktails match these filters.
-            </p>
-          )}
-          {filtered.map((c) => {
-            const globalIndex = cocktails.indexOf(c);
-            return (
-              <button
-                key={c.name}
-                onClick={() => setSelected(globalIndex)}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  textAlign: "left",
-                  background: "none",
-                  border: "none",
-                  borderBottom: "1px solid #1a1612",
-                  padding: "14px 0",
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 16, color: "#e8e0d4", marginBottom: 3 }}>
-                      {c.name}
-                      {c.source === "Claude" && (
-                        <span style={{
-                          fontSize: 9,
-                          marginLeft: 8,
-                          padding: "2px 7px",
-                          borderRadius: 10,
-                          background: "#d4a86722",
-                          color: "#d4a867",
-                          verticalAlign: "middle",
-                        }}>
-                          Claude
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ fontSize: 12, color: "#6a6054" }}>
-                      {c.base} · {c.method}
-                    </div>
+        )}
+      </div>
+
+      {/* List view */}
+      <div style={{ padding: "4px 20px 40px", maxWidth: 500, margin: "0 auto" }}>
+        {filtered.length === 0 && (
+          <p style={{ textAlign: "center", color: "#6a6054", fontStyle: "italic", marginTop: 32 }}>
+            No cocktails match these filters.
+          </p>
+        )}
+        {filtered.map((c) => {
+          const globalIndex = cocktails.indexOf(c);
+          return (
+            <button
+              key={c.name}
+              onClick={() => openDrink(globalIndex)}
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "left",
+                background: "none",
+                border: "none",
+                borderBottom: "1px solid #1a1612",
+                padding: "14px 0",
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 16, color: "#e8e0d4", marginBottom: 3 }}>
+                    {c.name}
+                    {c.source === "Claude" && (
+                      <span style={{
+                        fontSize: 9,
+                        marginLeft: 8,
+                        padding: "2px 7px",
+                        borderRadius: 10,
+                        background: "#d4a86722",
+                        color: "#d4a867",
+                        verticalAlign: "middle",
+                      }}>
+                        Claude
+                      </span>
+                    )}
                   </div>
-                  <span style={{
-                    fontSize: 10,
-                    padding: "3px 10px",
-                    borderRadius: 12,
-                    background: (catColors[c.category]?.pill || "#1a1a1a") + "66",
-                    color: catColors[c.category]?.text || "#aaa",
-                    flexShrink: 0,
-                    marginLeft: 8,
-                  }}>
-                    {c.category}
-                  </span>
+                  <div style={{ fontSize: 12, color: "#6a6054" }}>
+                    {c.base} · {c.method}
+                  </div>
                 </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
+                <span style={{
+                  fontSize: 10,
+                  padding: "3px 10px",
+                  borderRadius: 12,
+                  background: (catColors[c.category]?.pill || "#1a1a1a") + "66",
+                  color: catColors[c.category]?.text || "#aaa",
+                  flexShrink: 0,
+                  marginLeft: 8,
+                }}>
+                  {c.category}
+                </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
