@@ -167,6 +167,28 @@ const cocktails = [
     steps: "Stir with ice 30 sec. Strain into a coupe or over a big cube. Cherry garnish.",
     notes: "Traditionally uses Averna, but Nonino is lighter with more citrus peel and vanilla. Try with bourbon too.",
   },
+  {
+    name: "Tequila Bijou",
+    category: "Herbal",
+    base: "Reposado",
+    method: "Stirred",
+    source: "Claude",
+    vibe: "A citrus-free Bijou built on reposado instead of gin — equal parts elegance",
+    ingredients: ["1 oz reposado tequila", "1 oz sweet vermouth", "1 oz green chartreuse", "1 dash Angostura"],
+    steps: "Stir with ice 30 sec. Strain into a coupe. Lemon twist optional.",
+    notes: "A riff on the classic Bijou — reposado stands in for gin, Angostura for orange bitters. Same 'jewel' structure, agave-forward instead of botanical.",
+  },
+  {
+    name: "M&M (Mezcal & Montenegro)",
+    category: "Smoky",
+    base: "Mezcal",
+    method: "Stirred",
+    source: "Claude",
+    vibe: "Raton Canyon's smoky cousin — mezcal and Montenegro with cardamom spice",
+    ingredients: ["1½ oz mezcal", "1½ oz Montenegro amaro", "1 barspoon maraschino", "2 dashes cardamom bitters"],
+    steps: "Stir with ice 30 sec. Strain into a coupe. Lemon twist optional.",
+    notes: "A smoky riff on the Raton Canyon — mezcal in for gin. Same bittersweet, cardamom-spiced backbone.",
+  },
   // === FROM HIGHBALL ===
   {
     name: "Bijou",
@@ -478,6 +500,8 @@ const cocktails = [
   },
 ];
 
+const WHISKEY_ALIASES = ["whiskey", "whisky", "bourbon", "rye", "scotch"];
+
 const categories = ["All", ...Array.from(new Set(cocktails.map(c => c.category)))];
 const sources = ["All", "Claude", "Highball"];
 const methods = ["All", "Stirred", "Shaken", "Built"];
@@ -505,12 +529,15 @@ export default function CocktailMenu() {
     if (filterSource !== "All" && c.source !== filterSource) return false;
     if (filterMethod !== "All" && c.method !== filterMethod) return false;
     if (search) {
-      const q = search.toLowerCase();
-      const inName = c.name.toLowerCase().includes(q);
-      const inBase = c.base.toLowerCase().includes(q);
-      const inIngredients = c.ingredients.some(ing => ing.toLowerCase().includes(q));
-      const inCategory = c.category.toLowerCase().includes(q);
-      const inVibe = c.vibe.toLowerCase().includes(q);
+      const q = search.toLowerCase().trim();
+      const isWhiskeyQuery = q.length >= 3 && ("whiskey".startsWith(q) || "whisky".startsWith(q));
+      const terms = isWhiskeyQuery ? WHISKEY_ALIASES : [q];
+      const matches = text => terms.some(t => text.toLowerCase().includes(t));
+      const inName = matches(c.name);
+      const inBase = matches(c.base);
+      const inIngredients = c.ingredients.some(ing => matches(ing));
+      const inCategory = matches(c.category);
+      const inVibe = matches(c.vibe);
       if (!inName && !inBase && !inIngredients && !inCategory && !inVibe) return false;
     }
     return true;
